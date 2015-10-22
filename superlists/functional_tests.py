@@ -26,11 +26,22 @@ class NewVisitorTest(unittest.TestCase):
         inputbox.send_keys("Buy a jug of milk.")
         inputbox.send_keys(Keys.ENTER)
 
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys("Drink the whole jug of milk.")
+        inputbox.send_keys(Keys.ENTER)
+
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertTrue(
-                any(row.text == '1: Buy a jug of milk.' for row in rows),
-                "New item did not appeear in the list.")
+
+        self.assertIn(
+                '1: Buy a jug of milk.', [row.text for row in rows],
+                "New item did not appear in the list.")
+
+        self.assertIn(
+                '2: Drink the whole jug of milk.', [row.text for row in rows],
+                "New item did not appear in the list.")
+
+        
 
 
         self.fail('Finish the test!')
