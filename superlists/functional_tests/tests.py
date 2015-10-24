@@ -30,6 +30,8 @@ class NewVisitorTest(LiveServerTestCase):
             'Enter a to-do item'
             )
         inputbox.send_keys("Buy a jug of milk.")
+        user_list_url = self.browser.current_url
+        self.assertRegex(user_list_url, '/lists/.+')
         inputbox.send_keys(Keys.ENTER)
         self.check_for_row_in_list_table('1: Buy a jug of milk.')
 
@@ -40,4 +42,17 @@ class NewVisitorTest(LiveServerTestCase):
         self.check_for_row_in_list_table('1: Buy a jug of milk.')
         self.check_for_row_in_list_table('2: Drink a jug of milk.')
 
-        self.fail('Finish the test!')
+        # Now a new user Francine visits the site
+
+        ## Now e use a new browser session to make sure that no information
+        ## from the previous user is coming through from cookies, LocalStorage etc
+        self.browser.quit()
+        self.browser = webdriver.Firefox()
+
+        # Francine visits the home page. There is not sign of the previously created list
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('Buy a jug of milk.', page_text)
+        self.assertNotIn('Drink a jug of milk.', page_text)
+
+
