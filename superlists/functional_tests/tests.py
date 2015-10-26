@@ -64,8 +64,6 @@ class NewVisitorTest(LiveServerTestCase):
 
         # Francine gets her unique URL
         francine_list_url = self.browser.current_url
-        print(francine_list_url)
-        print(user_list_url)
         self.assertRegex(francine_list_url, '/lists/.+')
         self.assertNotEqual(francine_list_url, user_list_url)
 
