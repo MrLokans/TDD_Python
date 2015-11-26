@@ -1,0 +1,26 @@
+---
+- hosts: all
+  sudo: true
+
+  vars:
+      sitename=superlists-andrew
+  pre_tasks:
+    - name: update apt cache
+      apt: update_cache=yes
+
+  tasks:
+    - name: install nginx
+      apt: name=nginx state=present
+
+    - name: add user elspeth
+      user: name=elpspeth shell=/bin/bash groups=sudo
+
+    - name: install git
+      apt: name=git state=present
+    - name: install python 3
+      apt: name=python3 state=present
+    - name: install pip
+      apt: name=python3-pip
+    - name: install virtualenv
+      pip: name=virtualenv state=present executable=pip3
+
