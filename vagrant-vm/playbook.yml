@@ -53,15 +53,23 @@
     - name: reload nginx
       service: name=nginx state=reloaded
 
+
     # manage.py can not be found! needs to be fixed!
     - name: prepare databases
-      django_manage: app_path=~/sites/{{ sitename }}/source/superlists/
-                     command='migrate --noinput'
-                     virtualenv=~/sites/{{ sitename }}/virtualenv
+      django_manage:  >
+                virtualenv=~/sites/{{ sitename }}/virtualenv
+                app_path=~/sites/{{ sitename }}/source/superlists/
+                command='migrate --noinput'
+                     
 
     - name: run application
       django_manage: >
+                virtualenv=~/sites/{{ sitename }}/virtualenv
                 app_path=~/sites/{{ sitename }}/source/superlists/
                 command=runserver
-                virtualenv=~/sites/{{ sitename }}/virtualenv
+                
 
+
+
+    - name: install and run gunicorn
+      pip: virtualenv=~/sites/{{ sitename }}/virtualenv name=gunicorn
