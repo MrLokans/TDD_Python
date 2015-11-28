@@ -6,41 +6,58 @@
       username: elspeth
       sitename: superlists-andrew
       site_repo: https://github.com/MrLokans/TDD_Python
+      django_port: 8080
+  
   pre_tasks:
     - name: update apt cache
       apt: update_cache=yes
 
   tasks:
-    - name: install nginx
-      apt: name=nginx state=present
-
     - name: add user elspeth
       user: name={{ username }} shell=/bin/bash groups=sudo
 
     - name: install git, python and pip
-      apt: name=git state=present
-      apt: name=python3 state=present
-      apt: name=python3-pip
+      apt: name={{ item }} state=present
+      with_items:
+        - nginx
+        - git
+        - python3
+        - python3-pip
 
     - name: install virtualenv
       pip: name=virtualenv state=present executable=pip3
 
       # Rethink user usage later
     - name: create folders
-      file: path=~/sites/{{ sitename }}/database state=directory recurse=yes
+
       file: path=~/sites/{{ sitename }}/static state=directory recurse=yes
       file: path=~/sites/{{ sitename }}/virtualenv state=directory recurse=yes
       file: path=~/sites/{{ sitename }}/source state=directory recurse=yes
 
-    - name: checkout source repository
-      git: repo={{ site_repo }} dest=~/sites/{{ sitename }}/source
+      ignore_errors: yes
+
+
+      become: yes
+      become_user: "{{ username }}"
+
 
     - name: create venv and install django in it
-      pip: virtualenv=~/sites/{{ sitename }}/virtualenv name=django version=1.7
+      pip: virtualenv=~/sites/{{ sitename }}/virtualenv name={{ item }}
+      with_items:
+            - django
+            - gunicorn
+      become: yes
+      become_user: "{{ username }}"
+
+    - name: checkout source repository
+      git: repo={{ site_repo }} dest=~/sites/{{ sitename }}/source
+      become: yes
+      become_user: "{{ username }}"
 
     - name: copy nginx config
       template: src=templates/nginx.conf.j2
                 dest=/etc/nginx/sites-available/{{ sitename }}
+
     - name: enable nginx sitename
       file: src=/etc/nginx/sites-available/{{ sitename }}
             dest=/etc/nginx/sites-enabled/{{ sitename }}
@@ -54,22 +71,27 @@
       service: name=nginx state=reloaded
 
 
-    # manage.py can not be found! needs to be fixed!
+    - file: path=~/sites/{{ sitename }}/source/database state=directory recurse=yes
+      become: yes
+      become_user: "{{ username }}"
+      ignore_errors: yes
+
     - name: prepare databases
       django_manage:  >
-                virtualenv=~/sites/{{ sitename }}/virtualenv
-                app_path=~/sites/{{ sitename }}/source/superlists/
-                command='migrate --noinput'
-                     
+                virtualenv=/home/{{ username }}/sites/{{ sitename }}/virtualenv
+                app_path=/home/{{ username }}/sites/{{ sitename }}/source/superlists
+                command=migrate
+      become: yes
+      become_user: "{{ username }}"      
+                       
 
     - name: run application
-      django_manage: >
-                virtualenv=~/sites/{{ sitename }}/virtualenv
-                app_path=~/sites/{{ sitename }}/source/superlists/
-                command=runserver
-                
-
-
-
-    - name: install and run gunicorn
-      pip: virtualenv=~/sites/{{ sitename }}/virtualenv name=gunicorn
+      # django_manage: >
+                # virtualenv=/home/{{ username }}/sites/{{ sitename }}/virtualenv
+                # app_path=/home/{{ username }}/sites/{{ sitename }}/source/superlists
+                # command=runserver
+      command: bash -c 'nohup ~/sites/{{ sitename }}/virtualenv/bin/python ~/sites/{{ sitename }}/source/superlists/manage.py runserver 0.0.0.0:{{ django_port }} &'
+      # async: 45
+      # poll: 0
+      become: yes
+      become_user: "{{ username }}"
