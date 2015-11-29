@@ -1,21 +1,16 @@
 {
-  "name": "Lists module deps",
+  "name": "static",
   "homepage": "https://github.com/MrLokans/TDD_Python",
   "authors": [
     "MrLokans <trikster1911@gmail.com>"
   ],
   "description": "",
   "main": "",
-  "moduleType": [],
+  "moduleType": [
+    "amd"
+  ],
   "license": "MIT",
   "private": true,
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components"
-    "test",
-    "tests"
-  ],
   "dependencies": {
     "bootstrap": "~3.3.5"
   }
