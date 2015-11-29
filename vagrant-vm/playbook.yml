@@ -6,7 +6,7 @@
       username: elspeth
       sitename: superlists-andrew
       site_repo: https://github.com/MrLokans/TDD_Python
-      django_port: 8080
+      django_port: 8000
   
   pre_tasks:
     - name: update apt cache
@@ -23,6 +23,14 @@
         - git
         - python3
         - python3-pip
+        - nodejs
+        - npm
+
+    - name: make nodejs available by 'node' alias
+      file: src=/usr/bin/nodejs dest=/usr/bin/node state=link
+    # may be its not really a correct way, rethink later 
+    - name: install bower to get JS deps
+      npm: name=bower global=yes
 
     - name: install virtualenv
       pip: name=virtualenv state=present executable=pip3
@@ -36,7 +44,6 @@
 
       ignore_errors: yes
 
-
       become: yes
       become_user: "{{ username }}"
 
@@ -49,6 +56,10 @@
       become: yes
       become_user: "{{ username }}"
 
+    # now vagrant settings are stored in repo, which is not a nice way
+    # perhaps its better to store project sources in 'master' branch only
+    # or to checkout only specific folder (how?)
+    # see 'sparse checkout' http://bit.ly/1jqTlMH
     - name: checkout source repository
       git: repo={{ site_repo }} dest=~/sites/{{ sitename }}/source
       become: yes
@@ -83,14 +94,26 @@
                 command=migrate
       become: yes
       become_user: "{{ username }}"      
-                       
+       
+    # that does not seem to be the right way to manage statics
+    - name : install static dependencies
+      command: bower install
+      args:
+        chdir: ~/sites/{{ sitename }}/source/superlists/lists/static
+      become: yes
+      become_user: "{{ username }}"
 
-    - name: run application
-      # django_manage: >
-                # virtualenv=/home/{{ username }}/sites/{{ sitename }}/virtualenv
-                # app_path=/home/{{ username }}/sites/{{ sitename }}/source/superlists
-                # command=runserver
-      command: bash -c 'nohup ~/sites/{{ sitename }}/virtualenv/bin/python ~/sites/{{ sitename }}/source/superlists/manage.py runserver 0.0.0.0:{{ django_port }} &'
+    - name: collect statics
+      django_manage:  >
+                virtualenv=/home/{{ username }}/sites/{{ sitename }}/virtualenv
+                app_path=/home/{{ username }}/sites/{{ sitename }}/source/superlists
+                command='collectstatic --noinput'
+      become: yes
+      become_user: "{{ username }}"
+
+    - command: bash -c 'nohup ~/sites/{{ sitename }}/virtualenv/bin/gunicorn superlists.wsgi:application --bind 127.0.0.1:{{ django_port }} &'
+      args:
+        chdir: ~/sites/{{ sitename }}/source/superlists
       # async: 45
       # poll: 0
       become: yes
