@@ -1,6 +1,11 @@
 server {
     listen 80;
     server_name {{ sitename }};
+
+    location /static {
+        alias /home/{{ username }}/sites/{{ sitename }}/source/static;
+    }
+
     location / {
         proxy_pass http://localhost:{{ django_port }};
     }
