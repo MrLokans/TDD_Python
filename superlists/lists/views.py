@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+from django.core.exceptions import ValidationError
+
 from lists.models import Item, List
 
 
@@ -8,7 +10,11 @@ def home_page(request):
 
 def new_list(request):
     list_ = List.objects.create()
-    Item.objects.create(text=request.POST['item_text'], list=list_)
+    item = Item.objects.create(text=request.POST['item_text'], list=list_)
+    try:
+        item.full_clean()
+    except ValidationError:
+        return render(request, 'home.html')
     return redirect('/lists/%d/' % (list_.id,))
 
 
