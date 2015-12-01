@@ -111,6 +111,8 @@
       become: yes
       become_user: "{{ username }}"
 
+    # a crappy way to run app
+    # next thing is ti write upstart/systemd units which handle start
     - command: bash -c 'nohup ~/sites/{{ sitename }}/virtualenv/bin/gunicorn superlists.wsgi:application --bind 127.0.0.1:{{ django_port }} &'
       args:
         chdir: ~/sites/{{ sitename }}/source/superlists
