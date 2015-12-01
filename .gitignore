@@ -1,3 +1,4 @@
 static/**
 **/.vagrant/**
 **/*.sqlite
+**/database/
