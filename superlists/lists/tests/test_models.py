@@ -40,3 +40,7 @@ class ListAndItemModelTest(TestCase):
             # we need it to run full constraint validation
             # against SQLite
             item.full_clean()
+
+    def test_get_Absolute_url(self):
+        list_ = List.objects.create()
+        self.assertEqual(list_.get_absolute_url(), '/lists/{}/'.format(list_.id))
