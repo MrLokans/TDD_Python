@@ -3,6 +3,7 @@ import sys
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 
+
 class FunctionalTest(StaticLiveServerTestCase):
 
     @classmethod
@@ -26,6 +27,9 @@ class FunctionalTest(StaticLiveServerTestCase):
     def tearDown(self):
         self.browser.quit()
         # self.browser.implicitly_wait(3)
+
+    def get_item_input_box(self):
+        return self.browser.find_element_by_id('id_text')
 
     def check_for_row_in_list_table(self, row_text):
         table = self.browser.find_element_by_id('id_list_table')
