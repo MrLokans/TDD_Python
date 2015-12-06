@@ -8,7 +8,7 @@
 <body>
     <div id="qunit"></div>
     <div id="qunit-fixture">
-    <!-- content of each fixture is reset before every test -->
+        <!-- content of each fixture is reset before every test -->
         <form action="">
             <input name="text">
             <div class="has-error">Error text</div>
@@ -19,26 +19,19 @@
 
 
     <script src="qunit.js"></script>
+    <script src="../list.js"></script>
 
     <script>
 
-test("smoke test", function(){
-    er = $('.has-error');
-
-    equal(er.is(':visible'), true);
-    er.hide();
-    equal(er.is(':visible'), false);
-
+test("errors should be hidden after keypress", function(){
+    $('input').trigger('keypress');
+    equal($('.has-error').is(':visible'), false);
 });
 
-test("smoke test 2", function(){
-    er = $('.has-error');
-
-    equal(er.is(':visible'), true);
-    er.hide();
-    equal(er.is(':visible'), false);
-
+test("errors are not hidden until keypress", function(){
+    equal($('.has-error').is(':visible'), true);
 });
+
     </script> 
 </body>
 </html>
