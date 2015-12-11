@@ -32,3 +32,10 @@ class LoginViewTest(TestCase):
         self.client.post('/accounts/login', {'assertion': 'a'})
         self.assertEqual(self.client.session[SESSION_KEY], user.pk)
         # .pk - is the PrimaryKey for the user model
+
+    @patch('accounts.views.autheticate')
+    def test_does_not_get_logged_in_if_auth_returns_None(self, mock_authenticate):
+        mock_authenticate.return_value = None
+        self.client.post('/accounts/login', {'assertion': 'a'})
+        self.assertNotIn(SESSION_KEY, self.client.session)
+    
