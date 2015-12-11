@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, SESSION_KEY
 from django.test import TestCase
 from unittest.mock import patch
 User = get_user_model()
@@ -23,3 +23,12 @@ class LoginViewTest(TestCase):
         mock_authenticate.return_value = user
         response = self.client.post('/accounts/login', {'assertion': 'a'})
         self.assertEqual(response.content.decode(), 'OK')
+
+    @patch('accounts.views.autheticate')
+    def test_gets_logged_in_session_if_authenticate_returns_a_user(self, mock_authenticate):
+        user = User.objects.create(email='a@a.a')
+        user.backend = ''
+        mock_authenticate.return_value = user
+        self.client.post('/accounts/login', {'assertion': 'a'})
+        self.assertEqual(self.client.session[SESSION_KEY], user.pk)
+        # .pk - is the PrimaryKey for the user model
