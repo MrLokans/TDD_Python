@@ -25,7 +25,7 @@ SECRET_KEY = 'cewh@mjx_+*gn+r1-=9lc1n48t5_eu*5@0g16)xqh_+e9-o=#k'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [] #['127.0.0.1:8000']
+ALLOWED_HOSTS = []  # ['127.0.0.1:8000']
 
 
 # Application definition
@@ -103,3 +103,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '../static'))
+
+AUTH_USER_MODEL = 'accounts.User'
+AUTHENTICATION_BACKENDS = (
+    'accounts.authentication.PersonaAuthenticationBackend',
+    )
