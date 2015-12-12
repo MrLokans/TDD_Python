@@ -12,7 +12,7 @@
     <nav class="navbar navbar-default" role="navigation">
         <a href="/" class="navbar-brand">Superlists</a>
         {% if user.email %}
-            <a href="#" class="btn navbar-btn navbar-right" id="id_logout">Log out</a>
+            <a href="{% url 'logout' %}" class="btn navbar-btn navbar-right" id="id_logout">Log out</a>
             <span class="navbar-text navbar-right">Logged in as {{ user.email }}</span>
         {% else %}
             <a href="#" class="btn navbar-btn navbar-right" id="id_login">Sign in</a>
@@ -50,6 +50,7 @@
 </div>
     <script src="/static/bower_components/jquery/dist/jquery.min.js"></script>
     <script src="/static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://login.persona.org/include.js"></script>"
     <script src="/static/list.js"></script>
     <script src="/static/accounts.js"></script>
     <script>
