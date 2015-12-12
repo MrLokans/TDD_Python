@@ -53,6 +53,7 @@
       with_items:
             - django
             - gunicorn
+            - requests
       become: yes
       become_user: "{{ username }}"
 
